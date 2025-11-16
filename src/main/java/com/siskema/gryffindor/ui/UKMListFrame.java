@@ -1,42 +1,36 @@
 package com.siskema.gryffindor.ui;
 
+import com.siskema.gryffindor.model.User; // BARU
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class UKMListFrame extends ListFrame {
 
-    public UKMListFrame() {
-        super("Daftar UKM");
+    public UKMListFrame(User user) { // <-- DIUBAH
+        super("Daftar UKM", user); // <-- DIUBAH
     }
 
+    // ... (Semua method lain SAMA, masih pakai data dummy) ...
+    // ... (createCenterColumn, createCardContent, styleButton) ...
+    
     @Override
     protected JPanel createCenterColumn() {
         JPanel center = new JPanel(new BorderLayout(0, 15));
         center.setBackground(UIConstants.COLOR_BACKGROUND);
 
-        JLabel title = new JLabel("Daftar UKM"); 
+        JLabel title = new JLabel("Daftar UKM");
         title.setFont(UIConstants.FONT_TITLE);
         center.add(title, BorderLayout.NORTH);
 
-        // Search & Filter Panel 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         searchPanel.setBackground(UIConstants.COLOR_BACKGROUND);
-
         RoundedTextField searchField = new RoundedTextField();
         searchField.setPreferredSize(new Dimension(350, 38));
         searchField.setText("  Cari UKM...");
         searchField.setForeground(UIConstants.COLOR_TEXT_LIGHT);
-        
-        String[] fakultas = {"Semua Fakultas", "Fakultas Teknik", "Fakultas Ekonomi"};
-        JComboBox<String> fakultasFilter = new JComboBox<>(fakultas);
-        fakultasFilter.setFont(UIConstants.FONT_NORMAL);
-        fakultasFilter.setPreferredSize(new Dimension(150, 38));
-
         searchPanel.add(searchField);
-        searchPanel.add(fakultasFilter);
-        
-        // List UKM
+
         JPanel listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
         listPanel.setBackground(UIConstants.COLOR_BACKGROUND);
@@ -46,9 +40,7 @@ public class UKMListFrame extends ListFrame {
         listPanel.add(Box.createVerticalStrut(10));
         listPanel.add(createCardContent("Mapala", "1998", "100 orang", "Aktif", true));
         listPanel.add(Box.createVerticalStrut(10));
-        listPanel.add(createCardContent("BEM", "2005", "45 orang", "Selesai", false));
-        listPanel.add(Box.createVerticalStrut(10));
-        listPanel.add(Box.createVerticalGlue()); 
+        listPanel.add(Box.createVerticalGlue());
 
         JScrollPane scrollPane = new JScrollPane(listPanel);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -64,74 +56,48 @@ public class UKMListFrame extends ListFrame {
     }
     
     @Override
-    protected JPanel createCardContent(String title,
-                                       String estDate, // Diubah menjadi Est Date
-                                       String participants,
-                                       String status,
-                                       boolean canRegister) {
-        // Logika card content sama dengan ActivityListFrame.createCardContent()
-        JPanel ukm = new JPanel(new GridBagLayout()); 
+    protected JPanel createCardContent(String title, String estDate, String participants, String status, boolean canRegister) {
+        JPanel ukm = new JPanel(new GridBagLayout());
         ukm.setBackground(UIConstants.COLOR_CARD);
         ukm.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(230, 230, 230)),
-                new EmptyBorder(15, 20, 15, 20) 
+                new EmptyBorder(15, 20, 15, 20)
         ));
         ukm.setMaximumSize(new Dimension(Integer.MAX_VALUE, ukm.getPreferredSize().height));
         
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.weightx = 1.0; 
+        gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
 
-        // Info Panel
         JPanel infoPanel = new JPanel();
         infoPanel.setBackground(UIConstants.COLOR_CARD);
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-
         JLabel titleLabel = new JLabel(title);
         titleLabel.setFont(UIConstants.FONT_SUBTITLE);
-        titleLabel.setForeground(UIConstants.COLOR_TEXT_DARK);
-        
-        JLabel dateLabel = new JLabel("Est. " + estDate + " | Anggota: " + participants); 
+        JLabel dateLabel = new JLabel("Est. " + estDate + " | Anggota: " + participants);
         dateLabel.setFont(UIConstants.FONT_SMALL);
         dateLabel.setForeground(UIConstants.COLOR_TEXT_LIGHT);
-        
-        JLabel statusLabel = new JLabel(status);
-        statusLabel.setFont(UIConstants.FONT_SMALL);
-        statusLabel.setForeground(
-                "Selesai".equalsIgnoreCase(status) ?
-                        new Color(150, 150, 150) : new Color(0, 150, 0)
-        );
-        
         infoPanel.add(titleLabel);
         infoPanel.add(Box.createVerticalStrut(3));
         infoPanel.add(dateLabel);
-        infoPanel.add(Box.createVerticalStrut(5));
-        infoPanel.add(statusLabel);
-        
         ukm.add(infoPanel, gbc);
 
-        // Button Panel
         gbc.gridx = 1;
-        gbc.weightx = 0.0; 
-        gbc.fill = GridBagConstraints.NONE; 
-        gbc.anchor = GridBagConstraints.EAST; 
-
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         buttonPanel.setBackground(UIConstants.COLOR_CARD);
-        
         JButton detailButton = new JButton("Lihat Detail");
         styleButton(detailButton, UIConstants.COLOR_BUTTON_GRAY, UIConstants.COLOR_TEXT_DARK);
-        
-        JButton daftarButton = new JButton("Gabung"); 
+        JButton daftarButton = new JButton("Gabung");
         styleButton(daftarButton, UIConstants.COLOR_PRIMARY, Color.WHITE);
         daftarButton.setEnabled(canRegister);
-
         buttonPanel.add(detailButton);
         buttonPanel.add(daftarButton);
-
         ukm.add(buttonPanel, gbc);
 
         return ukm;

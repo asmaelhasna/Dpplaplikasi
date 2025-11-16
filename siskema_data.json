@@ -1,0 +1,53 @@
+{
+  "users": [
+    {
+      "username": "mhs",
+      "password": "123",
+      "fullName": "Mahasiswa Satu",
+      "role": "MAHASISWA"
+    },
+    {
+      "username": "ukm",
+      "password": "123",
+      "fullName": "UKM Mapala",
+      "role": "PENYELENGGARA",
+      "organizationName": "Mapala"
+    },
+    {
+      "username": "pkm",
+      "password": "123",
+      "fullName": "Admin PKM",
+      "role": "PKM"
+    },
+    {
+      "username": "123",
+      "password": "123123",
+      "fullName": "Zhidan",
+      "role": "MAHASISWA"
+    }
+  ],
+  "activities": [
+    {
+      "id": "8907993f-2353-4100-8215-d5c38cf51dd0",
+      "name": "Webinar Pelestarian Lingkungan",
+      "organizerName": "Mapala",
+      "date": "20 Nov 2025",
+      "location": "Aula FT",
+      "description": "Deskripsi webinar...",
+      "status": "APPROVED",
+      "registeredParticipants": [
+        "123"
+      ]
+    },
+    {
+      "id": "668682e1-24da-419a-8a8b-7893ef184ffe",
+      "name": "Alamak",
+      "organizerName": "Mapala",
+      "date": "30 Des 2025",
+      "location": "Mana kau mau",
+      "description": "ini deskripsi",
+      "status": "APPROVED",
+      "registeredParticipants": []
+    }
+  ]
+}
