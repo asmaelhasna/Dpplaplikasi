@@ -15,7 +15,6 @@ import javafx.scene.layout.VBox;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,14 +31,13 @@ public class ReportStage extends VBox {
         DataService ds = new DataService();
         List<Activity> all = ds.getAllActivities();
         
-        // --- Tab Pane untuk Memisahkan Laporan ---
         TabPane tabPane = new TabPane();
         
         // Tab 1: Statistik Bulanan
-        Tab tabStatistik = new Tab("Statistik Pendaftar Bulanan", createMonthlyStatistics(all));
+        Tab tabStatistik = new Tab("Statistik Bulanan", createMonthlyStatistics(all));
         tabStatistik.setClosable(false);
         
-        // Tab 2: Laporan Partisipasi
+        // Tab 2: Laporan Partisipasi Detail
         Tab tabPartisipasi = new Tab("Laporan Partisipasi", createParticipationReport(all));
         tabPartisipasi.setClosable(false);
         
@@ -60,40 +58,35 @@ public class ReportStage extends VBox {
         
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
         barChart.setTitle("Statistik Pendaftar Tahun " + LocalDate.now().getYear());
+        barChart.setLegendVisible(false);
         
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Pendaftar");
         
-        // Inisialisasi map bulan
+        // Inisialisasi Map Bulan
         Map<Month, Integer> monthlyCounts = new EnumMap<>(Month.class);
         for (Month m : Month.values()) {
             monthlyCounts.put(m, 0);
         }
 
-        // Hitung pendaftar per bulan berdasarkan tanggal kegiatan
-        // Asumsi format tanggal di activity adalah "dd MMM yyyy" (misal: "20 Nov 2025")
-        // Jika parsing gagal, data diabaikan (untuk simplifikasi dummy data)
+        // Parsing Tanggal manual (Contoh data: "20 Nov 2025")
         for (Activity a : activities) {
             try {
-                // Parsing sederhana untuk nama bulan dalam Bahasa Indonesia/Inggris
                 String dateStr = a.getDate(); 
-                // Coba ambil 3 huruf bulan (e.g. "Nov")
                 String[] parts = dateStr.split(" ");
                 if (parts.length >= 2) {
-                    String monthStr = parts[1];
-                    Month m = parseMonth(monthStr);
+                    Month m = parseMonth(parts[1]);
                     if (m != null) {
-                        monthlyCounts.put(m, monthlyCounts.get(m) + a.getRegisteredParticipants().size());
+                        int current = monthlyCounts.get(m);
+                        monthlyCounts.put(m, current + a.getRegisteredParticipants().size());
                     }
                 }
             } catch (Exception e) {
-                // Ignore parsing errors for dummy data
+                // Ignore parsing errors
             }
         }
 
-        // Masukkan ke chart
         for (Month m : Month.values()) {
-            series.getData().add(new XYChart.Data<>(m.getDisplayName(TextStyle.SHORT, Locale.ENGLISH), monthlyCounts.get(m)));
+            series.getData().add(new XYChart.Data<>(m.getDisplayName(TextStyle.SHORT, Locale.getDefault()), monthlyCounts.get(m)));
         }
         
         barChart.getData().add(series);
@@ -103,18 +96,18 @@ public class ReportStage extends VBox {
 
     private Month parseMonth(String monthStr) {
         String lower = monthStr.toLowerCase();
-        if (lower.startsWith("jan")) return Month.JANUARY;
-        if (lower.startsWith("feb")) return Month.FEBRUARY;
-        if (lower.startsWith("mar")) return Month.MARCH;
-        if (lower.startsWith("apr")) return Month.APRIL;
-        if (lower.startsWith("mei") || lower.startsWith("may")) return Month.MAY;
-        if (lower.startsWith("jun")) return Month.JUNE;
-        if (lower.startsWith("jul")) return Month.JULY;
-        if (lower.startsWith("agu") || lower.startsWith("aug")) return Month.AUGUST;
-        if (lower.startsWith("sep")) return Month.SEPTEMBER;
-        if (lower.startsWith("okt") || lower.startsWith("oct")) return Month.OCTOBER;
-        if (lower.startsWith("nov")) return Month.NOVEMBER;
-        if (lower.startsWith("des") || lower.startsWith("dec")) return Month.DECEMBER;
+        if (lower.contains("jan")) return Month.JANUARY;
+        if (lower.contains("feb")) return Month.FEBRUARY;
+        if (lower.contains("mar")) return Month.MARCH;
+        if (lower.contains("apr")) return Month.APRIL;
+        if (lower.contains("mei") || lower.contains("may")) return Month.MAY;
+        if (lower.contains("jun")) return Month.JUNE;
+        if (lower.contains("jul")) return Month.JULY;
+        if (lower.contains("agu") || lower.contains("aug")) return Month.AUGUST;
+        if (lower.contains("sep")) return Month.SEPTEMBER;
+        if (lower.contains("okt") || lower.contains("oct")) return Month.OCTOBER;
+        if (lower.contains("nov")) return Month.NOVEMBER;
+        if (lower.contains("des") || lower.contains("dec")) return Month.DECEMBER;
         return null;
     }
 
@@ -123,6 +116,7 @@ public class ReportStage extends VBox {
         container.setPadding(new Insets(10));
 
         TableView<ActivityReportRow> table = new TableView<>();
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         
         TableColumn<ActivityReportRow, String> colName = new TableColumn<>("Nama Kegiatan");
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -133,7 +127,7 @@ public class ReportStage extends VBox {
         TableColumn<ActivityReportRow, String> colDate = new TableColumn<>("Tanggal");
         colDate.setCellValueFactory(new PropertyValueFactory<>("date"));
         
-        TableColumn<ActivityReportRow, Integer> colCount = new TableColumn<>("Jumlah Peserta");
+        TableColumn<ActivityReportRow, Integer> colCount = new TableColumn<>("Jml Peserta");
         colCount.setCellValueFactory(new PropertyValueFactory<>("participantCount"));
 
         table.getColumns().addAll(colName, colOrg, colDate, colCount);
@@ -148,7 +142,6 @@ public class ReportStage extends VBox {
         return container;
     }
 
-    // Helper class untuk tabel
     public static class ActivityReportRow {
         private String name;
         private String organizer;

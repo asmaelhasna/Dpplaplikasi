@@ -69,7 +69,7 @@ public class DataService {
                 .orElse(null);
     }
 
-    // --- FITUR BARU: Get All UKM ---
+    // --- FITUR BARU: Ambil semua user UKM ---
     public List<User> getAllUKM() {
         return database.getUsers().stream()
                 .filter(user -> user.getRole() == UserRole.PENYELENGGARA)

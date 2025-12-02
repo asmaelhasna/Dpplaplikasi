@@ -34,13 +34,8 @@ public class BaseStage extends Stage {
         rootLayout = new BorderPane();
         rootLayout.setStyle("-fx-background-color: " + UIConstants.HEX_BACKGROUND + ";");
 
-        // Top Bar
         rootLayout.setTop(createTopBar());
-
-        // Right Menu (Sidebar)
         rootLayout.setRight(createRightMenu());
-
-        // Default Content
         rootLayout.setCenter(new StackPane(new Label("Loading...")));
 
         Scene scene = new Scene(rootLayout, 1200, 720);

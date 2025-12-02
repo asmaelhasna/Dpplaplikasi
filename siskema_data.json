@@ -81,6 +81,16 @@
         "2407134924",
         "mhs"
       ]
+    },
+    {
+      "id": "cc2bf0fe-1c5c-4e51-ab2d-2a01ff03304a",
+      "name": "asdf",
+      "organizerName": "Mapala",
+      "date": "12 December 2025",
+      "location": "123",
+      "description": "123",
+      "status": "PENDING_APPROVAL",
+      "registeredParticipants": []
     }
   ]
 }

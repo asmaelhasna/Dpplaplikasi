@@ -14,7 +14,6 @@ import javafx.scene.paint.Color;
 
 import java.util.List;
 
-// UBAH: extends VBox
 public class ApprovalStage extends VBox {
 
     private DataService dataService;
@@ -61,16 +60,22 @@ public class ApprovalStage extends VBox {
         card.setAlignment(Pos.CENTER_LEFT);
 
         VBox info = new VBox(5);
+        
         Label title = new Label(activity.getName());
         title.setFont(UIConstants.FONT_SUBTITLE);
+        // --- PERBAIKAN WARNA TEKS ---
+        title.setTextFill(Color.web(UIConstants.HEX_TEXT_DARK)); 
+        
         Label detail = new Label("Oleh: " + activity.getOrganizerName() + " | Tgl: " + activity.getDate());
         detail.setFont(UIConstants.FONT_SMALL);
+        detail.setTextFill(Color.web(UIConstants.HEX_TEXT_LIGHT));
+        
         info.getChildren().addAll(title, detail);
         HBox.setHgrow(info, Priority.ALWAYS);
 
         HBox btnBox = new HBox(10);
         Button rejectBtn = new Button("Tolak");
-        rejectBtn.setStyle("-fx-background-color: #9A242C; -fx-text-fill: white; -fx-cursor: hand;");
+        rejectBtn.setStyle("-fx-background-color: #9A242C; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5;");
         rejectBtn.setOnAction(e -> {
             activity.setStatus(ActivityStatus.REJECTED);
             dataService.updateActivity(activity);
@@ -78,7 +83,7 @@ public class ApprovalStage extends VBox {
         });
 
         Button approveBtn = new Button("Setujui");
-        approveBtn.setStyle("-fx-background-color: #009600; -fx-text-fill: white; -fx-cursor: hand;");
+        approveBtn.setStyle("-fx-background-color: #009600; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5;");
         approveBtn.setOnAction(e -> {
             activity.setStatus(ActivityStatus.APPROVED);
             dataService.updateActivity(activity);

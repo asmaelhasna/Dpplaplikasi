@@ -57,7 +57,8 @@ public class UKMListStage extends VBox {
         }
         String q = query.toLowerCase();
         List<User> filtered = allUKM.stream()
-                .filter(u -> u.getOrganizationName().toLowerCase().contains(q) || u.getFullName().toLowerCase().contains(q))
+                .filter(u -> (u.getOrganizationName() != null && u.getOrganizationName().toLowerCase().contains(q)) || 
+                             u.getFullName().toLowerCase().contains(q))
                 .collect(Collectors.toList());
         renderList(filtered);
     }
@@ -83,7 +84,8 @@ public class UKMListStage extends VBox {
         icon.setFont(UIConstants.FONT_TITLE);
 
         VBox info = new VBox(5);
-        Label name = new Label(ukm.getOrganizationName());
+        String orgName = ukm.getOrganizationName() != null ? ukm.getOrganizationName() : "Tanpa Nama Organisasi";
+        Label name = new Label(orgName);
         name.setFont(UIConstants.FONT_SUBTITLE);
         name.setTextFill(Color.web(UIConstants.HEX_TEXT_DARK));
         
