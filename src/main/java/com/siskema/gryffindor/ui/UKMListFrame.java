@@ -1,14 +1,21 @@
 package com.siskema.gryffindor.ui;
 
+import com.siskema.gryffindor.model.Activity;
 import com.siskema.gryffindor.model.User; 
+import com.siskema.gryffindor.service.DataService;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.util.List;
 
 public class UKMListFrame extends ListFrame {
 
+    private DataService dataService;
+    private JPanel listPanel;
+
     public UKMListFrame(User user) { 
-        super("Daftar UKM", user); 
+        super("Kegiatan Saya", user);
+        this.dataService = new DataService();
     }
 
     @Override
@@ -16,7 +23,7 @@ public class UKMListFrame extends ListFrame {
         JPanel center = new JPanel(new BorderLayout(0, 15));
         center.setBackground(UIConstants.COLOR_BACKGROUND);
 
-        JLabel title = new JLabel("Daftar UKM");
+        JLabel title = new JLabel("Kegiatan Saya");
         title.setFont(UIConstants.FONT_TITLE);
         center.add(title, BorderLayout.NORTH);
 
@@ -24,20 +31,14 @@ public class UKMListFrame extends ListFrame {
         searchPanel.setBackground(UIConstants.COLOR_BACKGROUND);
         RoundedTextField searchField = new RoundedTextField();
         searchField.setPreferredSize(new Dimension(350, 38));
-        searchField.setText("  Cari UKM...");
+        searchField.setText("  Cari Kegiatan...");
         searchField.setForeground(UIConstants.COLOR_TEXT_LIGHT);
         searchPanel.add(searchField);
 
-        JPanel listPanel = new JPanel();
+        listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
         listPanel.setBackground(UIConstants.COLOR_BACKGROUND);
         listPanel.setBorder(new EmptyBorder(10, 0, 0, 0));
-
-        listPanel.add(createCardContent("DPM", "2010", "50 orang", "Aktif", true));
-        listPanel.add(Box.createVerticalStrut(10));
-        listPanel.add(createCardContent("Mapala", "1998", "100 orang", "Aktif", true));
-        listPanel.add(Box.createVerticalStrut(10));
-        listPanel.add(Box.createVerticalGlue());
 
         JScrollPane scrollPane = new JScrollPane(listPanel);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -48,20 +49,57 @@ public class UKMListFrame extends ListFrame {
         contentPanel.add(scrollPane, BorderLayout.CENTER);
         
         center.add(contentPanel, BorderLayout.CENTER);
+        
+        // Load activities after UI initialization
+        loadUserActivities();
 
         return center;
     }
-    
-    @Override
-    protected JPanel createCardContent(String title, String estDate, String participants, String status, boolean canRegister) {
-        JPanel ukm = new JPanel(new GridBagLayout());
-        ukm.setBackground(UIConstants.COLOR_CARD);
-        ukm.setBorder(BorderFactory.createCompoundBorder(
+
+    private void loadUserActivities() {
+        listPanel.removeAll();
+        List<Activity> allActivities = dataService.getAllActivities();
+        
+        String organizationName = currentUser.getOrganizationName();
+        System.out.println("UKM Organization: " + organizationName);
+        System.out.println("Total activities: " + allActivities.size());
+        
+        // Filter aktivitas yang dibuat oleh UKM ini
+        List<Activity> userActivities = allActivities.stream()
+                .filter(a -> {
+                    boolean matches = a.getOrganizerName() != null && 
+                                    a.getOrganizerName().equals(organizationName);
+                    System.out.println("Activity: " + a.getName() + " | Organizer: " + a.getOrganizerName() + " | Matches: " + matches);
+                    return matches;
+                })
+                .toList();
+
+        System.out.println("Filtered activities: " + userActivities.size());
+
+        if (userActivities.isEmpty()) {
+            JLabel emptyLabel = new JLabel("Anda belum membuat kegiatan.");
+            emptyLabel.setFont(UIConstants.FONT_NORMAL);
+            listPanel.add(emptyLabel);
+        } else {
+            for (Activity activity : userActivities) {
+                listPanel.add(createActivityCard(activity));
+                listPanel.add(Box.createVerticalStrut(10));
+            }
+        }
+        listPanel.add(Box.createVerticalGlue());
+        listPanel.revalidate();
+        listPanel.repaint();
+    }
+
+    protected JPanel createActivityCard(Activity activity) {
+        JPanel card = new JPanel(new GridBagLayout());
+        card.setBackground(UIConstants.COLOR_CARD);
+        card.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(230, 230, 230)),
                 new EmptyBorder(15, 20, 15, 20)
         ));
-        ukm.setMaximumSize(new Dimension(Integer.MAX_VALUE, ukm.getPreferredSize().height));
-        
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, card.getPreferredSize().height));
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -72,53 +110,45 @@ public class UKMListFrame extends ListFrame {
         JPanel infoPanel = new JPanel();
         infoPanel.setBackground(UIConstants.COLOR_CARD);
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-        JLabel titleLabel = new JLabel(title);
+
+        JLabel titleLabel = new JLabel(activity.getName());
         titleLabel.setFont(UIConstants.FONT_SUBTITLE);
-        JLabel dateLabel = new JLabel("Est. " + estDate + " | Anggota: " + participants);
+        infoPanel.add(titleLabel);
+
+        JLabel dateLabel = new JLabel(activity.getDate() + " | " + activity.getLocation());
         dateLabel.setFont(UIConstants.FONT_SMALL);
         dateLabel.setForeground(UIConstants.COLOR_TEXT_LIGHT);
-        infoPanel.add(titleLabel);
-        infoPanel.add(Box.createVerticalStrut(3));
         infoPanel.add(dateLabel);
-        ukm.add(infoPanel, gbc);
+
+        card.add(infoPanel, gbc);
 
         gbc.gridx = 1;
         gbc.weightx = 0.0;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.EAST;
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         buttonPanel.setBackground(UIConstants.COLOR_CARD);
-        
+
         JButton detailButton = new JButton("Lihat Detail");
         styleButton(detailButton, UIConstants.COLOR_BUTTON_GRAY, UIConstants.COLOR_TEXT_DARK);
 
         detailButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, 
-                "Detail UKM: " + title + "\nAnggota: " + participants + "\nDidirikan: " + estDate + "\n\n(Ini adalah placeholder detail UKM)", 
-                "Detail " + title, 
-                JOptionPane.INFORMATION_MESSAGE);
+            new ActivityDetailFrame(currentUser, activity).setVisible(true);
+            dispose();
         });
 
-        JButton daftarButton = new JButton("Gabung");
-        styleButton(daftarButton, UIConstants.COLOR_PRIMARY, Color.BLACK);
-        daftarButton.setEnabled(canRegister);
-
-        daftarButton.addActionListener(e -> {
-            if (canRegister) {
-                JOptionPane.showMessageDialog(this, 
-                    "Anda berhasil mengajukan permohonan gabung ke UKM " + title + "! Mohon tunggu persetujuan.", 
-                    "Permohonan Terkirim", 
-                    JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
-        
         buttonPanel.add(detailButton);
-        buttonPanel.add(daftarButton);
-        ukm.add(buttonPanel, gbc);
+        card.add(buttonPanel, gbc);
 
-        return ukm;
+        return card;
     }
     
+    @Override
+    protected JPanel createCardContent(String title, String date, String participants, String status, boolean canRegister) {
+        return new JPanel();
+    }
+
     private void styleButton(JButton button, Color background, Color foreground) {
         button.setFont(UIConstants.FONT_SMALL);
         button.setBackground(background);

@@ -30,6 +30,18 @@
       "password": "adfsdf",
       "fullName": "afdadf",
       "role": "MAHASISWA"
+    },
+    {
+      "username": "2407134924",
+      "password": "123",
+      "fullName": "Zhidan Iannov Saaba",
+      "role": "MAHASISWA"
+    },
+    {
+      "username": "24123",
+      "password": "123",
+      "fullName": "Asma",
+      "role": "MAHASISWA"
     }
   ],
   "activities": [
@@ -54,7 +66,21 @@
       "location": "Mana kau mau",
       "description": "ini deskripsi",
       "status": "APPROVED",
-      "registeredParticipants": []
+      "registeredParticipants": [
+        "mhs"
+      ]
+    },
+    {
+      "id": "fb6ffbc9-edb1-48b5-afb4-66f6de92cf50",
+      "name": "Seminar Lingkungan",
+      "organizerName": "Mapala",
+      "date": "1 Des 2025",
+      "location": "Gedung Serbaguna",
+      "description": "-",
+      "status": "APPROVED",
+      "registeredParticipants": [
+        "2407134924"
+      ]
     }
   ]
 }
